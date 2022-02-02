@@ -55,11 +55,25 @@ def update(db: Session, policy_id: int, row:InsuranceUpdate):
   db.commit()
   return "ok"
 
+#for analytics
 def get_by_count(db: Session):
-    return db.query((Insurance.date_of_purchase).label("policy_date"), func.count(Insurance.date_of_purchase).label("count")).group_by(func.strftime("%Y-%m",Insurance.date_of_purchase)).all()
+    list1 = db.execute("SELECT strftime('%Y-%m',datetime(date_of_purchase)) as policy_date, count(date_of_purchase) as count FROM Insurance group by strftime('%Y-%m',datetime(date_of_purchase))")
+    mainlist = []
+    for i in list1:
+        mainlist.append({"policy_date":i.policy_date,"count":i.count})
+    return mainlist
   
 def get_by_region(db: Session,region:str):
-    return db.query(Insurance.date_of_purchase.label("policy_date"), func.count(Insurance.date_of_purchase).label("count")).filter(Insurance.customer_region==region).group_by(Insurance.date_of_purchase).all()
+    #SELECT strftime('%Y-%m',datetime(date_of_purchase)) as policy_date, count(date_of_purchase) as count FROM Insurance WHERE customer_region='North' group by strftime('%Y-%m',datetime(date_of_purchase))
+    if region:
+        print(region)
+        list1 = db.execute(f"SELECT strftime('%Y-%m',datetime(date_of_purchase)) as policy_date, count(date_of_purchase) as count FROM Insurance WHERE customer_region='{region}' group by strftime('%Y-%m',datetime(date_of_purchase))")
+    else:
+        list1 = db.execute("SELECT strftime('%Y-%m',datetime(date_of_purchase)) as policy_date, count(date_of_purchase) as count FROM Insurance group by strftime('%Y-%m',datetime(date_of_purchase))")
+    mainlist = []
+    for i in list1:
+        mainlist.append({"policy_date":i.policy_date,"count":i.count})
+    return mainlist
   
 def get_regions(db: Session):
     return db.query(Insurance.customer_region).distinct()

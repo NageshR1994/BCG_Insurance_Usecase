@@ -40,10 +40,10 @@ def allPolicies(db: Session = Depends(get_db)):
   return db_insurance.get_regions(db)
 
 #for insurance analytics
-@router.get('/graph',response_model=List[GraphDisplay])
+@router.get('/graph')
 def allPolicies(db: Session = Depends(get_db)):
   return db_insurance.get_by_count(db)
 
-@router.get('/graph/{region}',response_model=List[GraphDisplay])
+@router.get('/graph/{region}')
 def allPolicies(region: str,db: Session = Depends(get_db)):
   return db_insurance.get_by_region(db,region)
